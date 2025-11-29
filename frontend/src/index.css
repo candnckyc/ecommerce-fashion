@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Yohji Yamamoto inspired - Minimalist/Brutalist aesthetic */
+body {
+  margin: 0;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #FFFFFF;
+  color: #000000;
+}
+
+/* Remove all default rounding */
+* {
+  border-radius: 0 !important;
+}
+
+/* Toast animation */
+@keyframes slide-in {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-black text-white px-8 py-3 uppercase tracking-widest text-sm font-light border border-black hover:bg-white hover:text-black transition-all duration-300;
+  }
+  
+  .btn-secondary {
+    @apply bg-white text-black px-8 py-3 uppercase tracking-widest text-sm font-light border border-black hover:bg-black hover:text-white transition-all duration-300;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-3 border border-black focus:outline-none focus:border-2 bg-white text-black;
+  }
+  
+  .card {
+    @apply bg-white border border-black overflow-hidden hover:border-2 transition-all;
+  }
+  
+  /* Typography */
+  .heading-xl {
+    @apply text-5xl md:text-7xl font-light tracking-wider uppercase;
+  }
+  
+  .heading-lg {
+    @apply text-3xl md:text-5xl font-light tracking-wide uppercase;
+  }
+  
+  .heading-md {
+    @apply text-2xl md:text-3xl font-light tracking-wide uppercase;
+  }
+  
+  .body-text {
+    @apply text-sm tracking-wide leading-relaxed;
+  }
+}
+
+/* Custom selection color */
+::selection {
+  background: #000000;
+  color: #FFFFFF;
+}

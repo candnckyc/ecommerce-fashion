@@ -73,7 +73,25 @@ func (s *CartService) AddToCart(userID int, req *models.AddToCartRequest) error 
 	if variant == nil {
 		return errors.New("product variant not found")
 	}
-	if variant.StockQuantity < req.Quantity {
+
+	// Get current cart to check existing quantity
+	cartItems, err := s.cartRepo.GetUserCart(userID)
+	if err != nil {
+		return err
+	}
+
+	// Check if item already in cart
+	existingQty := 0
+	for _, item := range cartItems {
+		if item.ProductVariantID == req.ProductVariantID {
+			existingQty = item.Quantity
+			break
+		}
+	}
+
+	// Check total quantity (existing + new) against stock
+	totalQty := existingQty + req.Quantity
+	if totalQty > variant.StockQuantity {
 		return errors.New("insufficient stock")
 	}
 

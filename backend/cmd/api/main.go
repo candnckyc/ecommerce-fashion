@@ -58,35 +58,35 @@ func setupRoutes(router *mux.Router, db *sql.DB, cfg *config.Config) {
 	cartHandler := handlers.NewCartHandler(cartService)
 
 	// Health check
-	router.HandleFunc("/health", healthHandler.Check).Methods("GET")
+	router.HandleFunc("/health", healthHandler.Check).Methods("GET", "OPTIONS")
 
 	// API routes
 	api := router.PathPrefix("/api").Subrouter()
 	
 	// Public routes (no auth required)
-	api.HandleFunc("/health", healthHandler.Check).Methods("GET")
-	api.HandleFunc("/auth/register", authHandler.Register).Methods("POST")
-	api.HandleFunc("/auth/login", authHandler.Login).Methods("POST")
+	api.HandleFunc("/health", healthHandler.Check).Methods("GET", "OPTIONS")
+	api.HandleFunc("/auth/register", authHandler.Register).Methods("POST", "OPTIONS")
+	api.HandleFunc("/auth/login", authHandler.Login).Methods("POST", "OPTIONS")
 	
 	// Product routes (public)
-	api.HandleFunc("/products", productHandler.GetProducts).Methods("GET")
-	api.HandleFunc("/products/{id}", productHandler.GetProduct).Methods("GET")
-	api.HandleFunc("/brands", productHandler.GetBrands).Methods("GET")
-	api.HandleFunc("/categories", productHandler.GetCategories).Methods("GET")
+	api.HandleFunc("/products", productHandler.GetProducts).Methods("GET", "OPTIONS")
+	api.HandleFunc("/products/{id}", productHandler.GetProduct).Methods("GET", "OPTIONS")
+	api.HandleFunc("/brands", productHandler.GetBrands).Methods("GET", "OPTIONS")
+	api.HandleFunc("/categories", productHandler.GetCategories).Methods("GET", "OPTIONS")
 
 	// Protected routes (auth required)
 	protected := api.PathPrefix("").Subrouter()
 	protected.Use(middleware.AuthMiddleware(cfg.JWTSecret))
 	
 	// Auth protected routes
-	protected.HandleFunc("/auth/me", authHandler.Me).Methods("GET")
+	protected.HandleFunc("/auth/me", authHandler.Me).Methods("GET", "OPTIONS")
 	
 	// Cart routes (protected)
-	protected.HandleFunc("/cart", cartHandler.GetCart).Methods("GET")
-	protected.HandleFunc("/cart", cartHandler.AddToCart).Methods("POST")
-	protected.HandleFunc("/cart/{id}", cartHandler.UpdateCartItem).Methods("PUT")
-	protected.HandleFunc("/cart/{id}", cartHandler.RemoveFromCart).Methods("DELETE")
-	protected.HandleFunc("/cart/clear", cartHandler.ClearCart).Methods("DELETE")
+	protected.HandleFunc("/cart", cartHandler.GetCart).Methods("GET", "OPTIONS")
+	protected.HandleFunc("/cart", cartHandler.AddToCart).Methods("POST", "OPTIONS")
+	protected.HandleFunc("/cart/{id}", cartHandler.UpdateCartItem).Methods("PUT", "OPTIONS")
+	protected.HandleFunc("/cart/{id}", cartHandler.RemoveFromCart).Methods("DELETE", "OPTIONS")
+	protected.HandleFunc("/cart/clear", cartHandler.ClearCart).Methods("DELETE", "OPTIONS")
 	
 	log.Println("✓ Routes configured")
 	log.Println("  POST /api/auth/register")
@@ -101,4 +101,3 @@ func setupRoutes(router *mux.Router, db *sql.DB, cfg *config.Config) {
 	log.Println("  PUT  /api/cart/{id} (protected)")
 	log.Println("  DELETE /api/cart/{id} (protected)")
 }
-

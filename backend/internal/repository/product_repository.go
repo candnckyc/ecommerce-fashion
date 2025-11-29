@@ -260,7 +260,7 @@ func (r *ProductRepository) getCategoryByID(id int) (*models.Category, error) {
 
 // GetAllBrands retrieves all brands
 func (r *ProductRepository) GetAllBrands() ([]models.Brand, error) {
-	query := `SELECT id, name, slug, description, logo_url FROM brands ORDER BY name`
+	query := `SELECT id, name, slug, COALESCE(description, ''), COALESCE(logo_url, '') FROM brands ORDER BY name`
 	
 	rows, err := r.db.Query(query)
 	if err != nil {
@@ -283,7 +283,7 @@ func (r *ProductRepository) GetAllBrands() ([]models.Brand, error) {
 
 // GetAllCategories retrieves all categories
 func (r *ProductRepository) GetAllCategories() ([]models.Category, error) {
-	query := `SELECT id, name, slug, parent_id, description, image_url FROM categories ORDER BY name`
+	query := `SELECT id, name, slug, parent_id, COALESCE(description, ''), COALESCE(image_url, '') FROM categories ORDER BY name`
 	
 	rows, err := r.db.Query(query)
 	if err != nil {
