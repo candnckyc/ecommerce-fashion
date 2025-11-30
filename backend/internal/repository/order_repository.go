@@ -75,10 +75,12 @@ func (r *OrderRepository) CreateOrderItem(item *models.OrderItem) error {
 // GetUserOrders retrieves all orders for a user
 func (r *OrderRepository) GetUserOrders(userID int) ([]models.Order, error) {
 	query := `
-		SELECT id, user_id, order_number,
-		       shipping_address_line1, shipping_city, shipping_country, shipping_full_name,
+		SELECT id, user_id, order_number, 
+		       shipping_address_line1, shipping_address_line2, shipping_city,
+		       shipping_state, shipping_postal_code, shipping_country,
+		       shipping_full_name, shipping_phone,
 		       subtotal, shipping_cost, tax, total,
-		       status, payment_method, payment_status,
+		       status, payment_method, payment_status, notes,
 		       created_at, updated_at
 		FROM orders
 		WHERE user_id = $1
@@ -90,15 +92,17 @@ func (r *OrderRepository) GetUserOrders(userID int) ([]models.Order, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	
+
 	orders := []models.Order{}
 	for rows.Next() {
 		var o models.Order
 		err := rows.Scan(
 			&o.ID, &o.UserID, &o.OrderNumber,
-			&o.ShippingAddressLine1, &o.ShippingCity, &o.ShippingCountry, &o.ShippingFullName,
+			&o.ShippingAddressLine1, &o.ShippingAddressLine2, &o.ShippingCity,
+			&o.ShippingState, &o.ShippingPostalCode, &o.ShippingCountry,
+			&o.ShippingFullName, &o.ShippingPhone,
 			&o.Subtotal, &o.ShippingCost, &o.Tax, &o.Total,
-			&o.Status, &o.PaymentMethod, &o.PaymentStatus,
+			&o.Status, &o.PaymentMethod, &o.PaymentStatus, &o.Notes,
 			&o.CreatedAt, &o.UpdatedAt,
 		)
 		if err != nil {
@@ -106,7 +110,48 @@ func (r *OrderRepository) GetUserOrders(userID int) ([]models.Order, error) {
 		}
 		orders = append(orders, o)
 	}
+
+	return orders, nil
+}
+
+// GetAllOrders retrieves all orders (admin only)
+func (r *OrderRepository) GetAllOrders() ([]models.Order, error) {
+	query := `
+		SELECT id, user_id, order_number, 
+		       shipping_address_line1, shipping_address_line2, shipping_city,
+		       shipping_state, shipping_postal_code, shipping_country,
+		       shipping_full_name, shipping_phone,
+		       subtotal, shipping_cost, tax, total,
+		       status, payment_method, payment_status, notes,
+		       created_at, updated_at
+		FROM orders
+		ORDER BY created_at DESC
+	`
 	
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	orders := []models.Order{}
+	for rows.Next() {
+		var o models.Order
+		err := rows.Scan(
+			&o.ID, &o.UserID, &o.OrderNumber,
+			&o.ShippingAddressLine1, &o.ShippingAddressLine2, &o.ShippingCity,
+			&o.ShippingState, &o.ShippingPostalCode, &o.ShippingCountry,
+			&o.ShippingFullName, &o.ShippingPhone,
+			&o.Subtotal, &o.ShippingCost, &o.Tax, &o.Total,
+			&o.Status, &o.PaymentMethod, &o.PaymentStatus, &o.Notes,
+			&o.CreatedAt, &o.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		orders = append(orders, o)
+	}
+
 	return orders, nil
 }
 
@@ -269,4 +314,11 @@ func (r *OrderRepository) CreateAddress(addr *models.Address) (int, error) {
 	).Scan(&id, &addr.CreatedAt, &addr.UpdatedAt)
 	
 	return id, err
+}
+
+// UpdateOrderStatus updates order status
+func (r *OrderRepository) UpdateOrderStatus(orderID int, status string) error {
+	query := `UPDATE orders SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2`
+	_, err := r.db.Exec(query, status, orderID)
+	return err
 }

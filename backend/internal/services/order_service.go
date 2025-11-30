@@ -175,3 +175,13 @@ func (s *OrderService) CreateAddress(userID int, req *models.AddAddressRequest) 
 
 	return addr, nil
 }
+
+// GetAllOrders returns all orders (admin only)
+func (s *OrderService) GetAllOrders() ([]models.Order, error) {
+	return s.orderRepo.GetAllOrders()
+}
+
+// UpdateOrderStatus updates order status (admin only)
+func (s *OrderService) UpdateOrderStatus(orderID int, status string) error {
+	return s.orderRepo.UpdateOrderStatus(orderID, status)
+}

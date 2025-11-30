@@ -59,6 +59,7 @@ func setupRoutes(router *mux.Router, db *sql.DB, cfg *config.Config) {
 	productHandler := handlers.NewProductHandler(productService)
 	cartHandler := handlers.NewCartHandler(cartService)
 	orderHandler := handlers.NewOrderHandler(orderService)
+	adminHandler := handlers.NewAdminHandler(productService, orderService, userRepo)
 
 	// Health check
 	router.HandleFunc("/health", healthHandler.Check).Methods("GET", "OPTIONS")
@@ -100,6 +101,17 @@ func setupRoutes(router *mux.Router, db *sql.DB, cfg *config.Config) {
 	protected.HandleFunc("/addresses", orderHandler.GetAddresses).Methods("GET", "OPTIONS")
 	protected.HandleFunc("/addresses", orderHandler.CreateAddress).Methods("POST", "OPTIONS")
 	
+	// Admin routes (protected + admin role check)
+	admin := api.PathPrefix("/admin").Subrouter()
+	admin.Use(middleware.AuthMiddleware(cfg.JWTSecret))
+	admin.Use(middleware.AdminMiddleware())
+	
+	admin.HandleFunc("/stats", adminHandler.GetStats).Methods("GET", "OPTIONS")
+	admin.HandleFunc("/orders", adminHandler.GetAllOrders).Methods("GET", "OPTIONS")
+	admin.HandleFunc("/orders/{id}/status", adminHandler.UpdateOrderStatus).Methods("PUT", "OPTIONS")
+	admin.HandleFunc("/products/{id}/toggle", adminHandler.ToggleProduct).Methods("PUT", "OPTIONS")
+	admin.HandleFunc("/customers", adminHandler.GetAllCustomers).Methods("GET", "OPTIONS")
+	
 	log.Println("✓ Routes configured")
 	log.Println("  POST /api/auth/register")
 	log.Println("  POST /api/auth/login")
@@ -112,4 +124,6 @@ func setupRoutes(router *mux.Router, db *sql.DB, cfg *config.Config) {
 	log.Println("  POST /api/cart (protected)")
 	log.Println("  PUT  /api/cart/{id} (protected)")
 	log.Println("  DELETE /api/cart/{id} (protected)")
+	log.Println("  GET  /api/admin/stats (admin)")
+	log.Println("  GET  /api/admin/orders (admin)")
 }

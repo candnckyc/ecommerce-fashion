@@ -21,10 +21,10 @@ const Header = () => {
             <Link to="/products" className="text-sm uppercase tracking-wider hover:opacity-50 transition">
               All
             </Link>
-            <Link to="/products?category=4" className="text-sm uppercase tracking-wider hover:opacity-50 transition">
+            <Link to="/products?category=1" className="text-sm uppercase tracking-wider hover:opacity-50 transition">
               Women
             </Link>
-            <Link to="/products?category=5" className="text-sm uppercase tracking-wider hover:opacity-50 transition">
+            <Link to="/products?category=2" className="text-sm uppercase tracking-wider hover:opacity-50 transition">
               Men
             </Link>
           </nav>

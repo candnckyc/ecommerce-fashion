@@ -7,6 +7,9 @@ const ProductList = () => {
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
   const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
@@ -21,19 +24,51 @@ const ProductList = () => {
   }, []);
 
   useEffect(() => {
-    // Fetch products with filters
-    setLoading(true);
+    // Reset when filters change
+    setProducts([]);
+    setPage(1);
+    setHasMore(true);
+    fetchProducts(1);
+  }, [searchParams]);
+
+  const fetchProducts = (pageNum) => {
+    if (pageNum === 1) {
+      setLoading(true);
+    } else {
+      setLoadingMore(true);
+    }
+    
     const params = Object.fromEntries(searchParams);
+    params.limit = 20;
+    params.page = pageNum;
+    
     productsAPI.getAll(params)
       .then(response => {
-        setProducts(response.data.data);
+        const newProducts = response.data.data || [];
+        
+        if (pageNum === 1) {
+          setProducts(newProducts);
+        } else {
+          setProducts(prev => [...prev, ...newProducts]);
+        }
+        
+        // If we got less than 20, no more products
+        setHasMore(newProducts.length === 20);
         setLoading(false);
+        setLoadingMore(false);
       })
       .catch(error => {
         console.error('Failed to load products:', error);
         setLoading(false);
+        setLoadingMore(false);
       });
-  }, [searchParams]);
+  };
+
+  const handleLoadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchProducts(nextPage);
+  };
 
   const handleFilterChange = (key, value) => {
     const newParams = new URLSearchParams(searchParams);
@@ -132,6 +167,19 @@ const ProductList = () => {
                   </div>
                 </Link>
               ))}
+            </div>
+          )}
+
+          {/* Load More Button */}
+          {!loading && hasMore && (
+            <div className="mt-12 text-center">
+              <button
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                className="btn-secondary disabled:opacity-50"
+              >
+                {loadingMore ? 'Loading...' : 'Load More'}
+              </button>
             </div>
           )}
         </div>

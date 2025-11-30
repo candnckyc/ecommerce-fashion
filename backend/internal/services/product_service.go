@@ -65,3 +65,8 @@ func (s *ProductService) GetBrands() ([]models.Brand, error) {
 func (s *ProductService) GetCategories() ([]models.Category, error) {
 	return s.productRepo.GetAllCategories()
 }
+
+// ToggleActive toggles product active status (admin only)
+func (s *ProductService) ToggleActive(productID int) error {
+	return s.productRepo.ToggleActive(productID)
+}

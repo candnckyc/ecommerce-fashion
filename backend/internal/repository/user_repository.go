@@ -80,3 +80,39 @@ func (r *UserRepository) FindByID(id int) (*models.User, error) {
 	}
 	return user, err
 }
+
+// GetAllUsers retrieves all users
+func (r *UserRepository) GetAllUsers() ([]*models.User, error) {
+	query := `
+		SELECT id, email, password_hash, first_name, last_name, phone, role, created_at, updated_at
+		FROM users
+		ORDER BY created_at DESC
+	`
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var users []*models.User
+	for rows.Next() {
+		user := &models.User{}
+		err := rows.Scan(
+			&user.ID,
+			&user.Email,
+			&user.PasswordHash,
+			&user.FirstName,
+			&user.LastName,
+			&user.Phone,
+			&user.Role,
+			&user.CreatedAt,
+			&user.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+
+	return users, rows.Err()
+}

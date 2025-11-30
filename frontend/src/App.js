@@ -13,6 +13,10 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import OrderConfirmation from './pages/OrderConfirmation';
 import Orders from './pages/Orders';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminProducts from './pages/AdminProducts';
+import AdminOrders from './pages/AdminOrders';
+import AdminCustomers from './pages/AdminCustomers';
 
 function App() {
   return (
@@ -32,6 +36,10 @@ function App() {
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/order-confirmation/:id" element={<OrderConfirmation />} />
                 <Route path="/orders" element={<Orders />} />
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/products" element={<AdminProducts />} />
+                <Route path="/admin/orders" element={<AdminOrders />} />
+                <Route path="/admin/customers" element={<AdminCustomers />} />
               </Routes>
             </main>
             <Footer />

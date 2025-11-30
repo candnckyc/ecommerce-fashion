@@ -304,3 +304,10 @@ func (r *ProductRepository) GetAllCategories() ([]models.Category, error) {
 
 	return categories, nil
 }
+
+// ToggleActive toggles product active status
+func (r *ProductRepository) ToggleActive(productID int) error {
+	query := `UPDATE products SET is_active = NOT is_active WHERE id = $1`
+	_, err := r.db.Exec(query, productID)
+	return err
+}
