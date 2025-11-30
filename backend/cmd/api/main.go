@@ -45,17 +45,20 @@ func setupRoutes(router *mux.Router, db *sql.DB, cfg *config.Config) {
 	userRepo := repository.NewUserRepository(db)
 	productRepo := repository.NewProductRepository(db)
 	cartRepo := repository.NewCartRepository(db)
+	orderRepo := repository.NewOrderRepository(db)
 
 	// Initialize services
 	authService := services.NewAuthService(userRepo, cfg.JWTSecret)
 	productService := services.NewProductService(productRepo)
 	cartService := services.NewCartService(cartRepo, productRepo)
+	orderService := services.NewOrderService(orderRepo, cartRepo, productRepo)
 
 	// Initialize handlers
 	healthHandler := handlers.NewHealthHandler()
 	authHandler := handlers.NewAuthHandler(authService)
 	productHandler := handlers.NewProductHandler(productService)
 	cartHandler := handlers.NewCartHandler(cartService)
+	orderHandler := handlers.NewOrderHandler(orderService)
 
 	// Health check
 	router.HandleFunc("/health", healthHandler.Check).Methods("GET", "OPTIONS")
@@ -87,6 +90,15 @@ func setupRoutes(router *mux.Router, db *sql.DB, cfg *config.Config) {
 	protected.HandleFunc("/cart/{id}", cartHandler.UpdateCartItem).Methods("PUT", "OPTIONS")
 	protected.HandleFunc("/cart/{id}", cartHandler.RemoveFromCart).Methods("DELETE", "OPTIONS")
 	protected.HandleFunc("/cart/clear", cartHandler.ClearCart).Methods("DELETE", "OPTIONS")
+	
+	// Order routes (protected)
+	protected.HandleFunc("/orders", orderHandler.CreateOrder).Methods("POST", "OPTIONS")
+	protected.HandleFunc("/orders", orderHandler.GetOrders).Methods("GET", "OPTIONS")
+	protected.HandleFunc("/orders/{id}", orderHandler.GetOrder).Methods("GET", "OPTIONS")
+	
+	// Address routes (protected)
+	protected.HandleFunc("/addresses", orderHandler.GetAddresses).Methods("GET", "OPTIONS")
+	protected.HandleFunc("/addresses", orderHandler.CreateAddress).Methods("POST", "OPTIONS")
 	
 	log.Println("✓ Routes configured")
 	log.Println("  POST /api/auth/register")

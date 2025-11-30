@@ -28,6 +28,14 @@ func (s *ProductService) GetProducts(query *models.ProductListQuery) ([]models.P
 		return nil, err
 	}
 
+	// Populate images for each product
+	for i := range products {
+		images, err := s.productRepo.GetImagesByProductID(products[i].ID)
+		if err == nil {
+			products[i].Images = images
+		}
+	}
+
 	return products, nil
 }
 

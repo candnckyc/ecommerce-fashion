@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import Toast from '../components/Toast';
 
 const Cart = () => {
+  const navigate = useNavigate();
   const { cart, loading, updateCartItem, removeFromCart } = useCart();
   const [toast, setToast] = useState(null);
 
@@ -156,7 +157,10 @@ const Cart = () => {
               </div>
             </div>
 
-            <button className="btn-primary w-full mb-4">
+            <button 
+              onClick={() => navigate('/checkout')}
+              className="btn-primary w-full mb-4"
+            >
               Proceed to Checkout
             </button>
 

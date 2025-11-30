@@ -42,4 +42,17 @@ export const cartAPI = {
   removeFromCart: (id) => api.delete(`/cart/${id}`),
 };
 
+// Order API
+export const orderAPI = {
+  createOrder: (data) => api.post('/orders', data),
+  getOrders: () => api.get('/orders'),
+  getOrderById: (id) => api.get(`/orders/${id}`),
+};
+
+// Address API
+export const addressAPI = {
+  getAddresses: () => api.get('/addresses'),
+  createAddress: (data) => api.post('/addresses', data),
+};
+
 export default api;

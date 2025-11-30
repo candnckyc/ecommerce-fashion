@@ -157,7 +157,7 @@ func (r *ProductRepository) GetByID(id int) (*models.Product, error) {
 	}
 
 	// Get images
-	images, err := r.getImagesByProductID(product.ID)
+	images, err := r.GetImagesByProductID(product.ID)
 	if err == nil {
 		product.Images = images
 	}
@@ -197,7 +197,8 @@ func (r *ProductRepository) getVariantsByProductID(productID int) ([]models.Prod
 }
 
 // getImagesByProductID retrieves all images for a product
-func (r *ProductRepository) getImagesByProductID(productID int) ([]models.ProductImage, error) {
+// GetImagesByProductID retrieves images for a product
+func (r *ProductRepository) GetImagesByProductID(productID int) ([]models.ProductImage, error) {
 	query := `
 		SELECT id, product_id, image_url, alt_text, display_order, is_primary
 		FROM product_images

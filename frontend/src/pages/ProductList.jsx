@@ -106,12 +106,12 @@ const ProductList = () => {
               <p className="uppercase tracking-wider text-sm">No products found</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-black">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-px">
               {products.map(product => (
                 <Link 
                   key={product.id} 
                   to={`/products/${product.id}`}
-                  className="group bg-white"
+                  className="group bg-white border border-black"
                 >
                   <div className="aspect-[3/4] bg-gray-100 overflow-hidden">
                     {product.images && product.images[0] ? (
