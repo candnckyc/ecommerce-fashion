@@ -60,6 +60,7 @@ func setupRoutes(router *mux.Router, db *sql.DB, cfg *config.Config) {
 	cartHandler := handlers.NewCartHandler(cartService)
 	orderHandler := handlers.NewOrderHandler(orderService)
 	adminHandler := handlers.NewAdminHandler(productService, orderService, userRepo)
+	paymentHandler := handlers.NewPaymentHandler(db)
 
 	// Health check
 	router.HandleFunc("/health", healthHandler.Check).Methods("GET", "OPTIONS")
@@ -97,6 +98,11 @@ func setupRoutes(router *mux.Router, db *sql.DB, cfg *config.Config) {
 	protected.HandleFunc("/orders", orderHandler.CreateOrder).Methods("POST", "OPTIONS")
 	protected.HandleFunc("/orders", orderHandler.GetOrders).Methods("GET", "OPTIONS")
 	protected.HandleFunc("/orders/{id}", orderHandler.GetOrder).Methods("GET", "OPTIONS")
+	
+	// Payment routes (protected)
+	protected.HandleFunc("/payment/create-intent", paymentHandler.CreatePaymentIntent).Methods("POST", "OPTIONS")
+	protected.HandleFunc("/payment/confirm", paymentHandler.ConfirmPayment).Methods("POST", "OPTIONS")
+	protected.HandleFunc("/payment/status", paymentHandler.GetPaymentStatus).Methods("GET", "OPTIONS")
 	
 	// Address routes (protected)
 	protected.HandleFunc("/addresses", orderHandler.GetAddresses).Methods("GET", "OPTIONS")

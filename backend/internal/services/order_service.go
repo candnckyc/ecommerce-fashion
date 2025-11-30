@@ -115,10 +115,16 @@ func (s *OrderService) CreateOrder(userID int, req *models.CreateOrderRequest) (
 		return nil, err
 	}
 
-	// Create order items
+	// Create order items and reduce stock
 	for i := range orderItems {
 		orderItems[i].OrderID = orderID
 		err := s.orderRepo.CreateOrderItem(&orderItems[i])
+		if err != nil {
+			return nil, err
+		}
+		
+		// Reduce stock for this variant
+		err = s.productRepo.ReduceStock(orderItems[i].ProductVariantID, orderItems[i].Quantity)
 		if err != nil {
 			return nil, err
 		}

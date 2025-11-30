@@ -341,3 +341,28 @@ func (r *ProductRepository) SearchSuggestions(searchTerm string, limit int) ([]s
 	
 	return suggestions, nil
 }
+
+// ReduceStock reduces the stock quantity of a product variant
+func (r *ProductRepository) ReduceStock(variantID int, quantity int) error {
+	query := `
+		UPDATE product_variants 
+		SET stock_quantity = stock_quantity - $1
+		WHERE id = $2 AND stock_quantity >= $1
+	`
+	
+	result, err := r.db.Exec(query, quantity, variantID)
+	if err != nil {
+		return err
+	}
+	
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	
+	if rowsAffected == 0 {
+		return fmt.Errorf("insufficient stock or variant not found")
+	}
+	
+	return nil
+}
