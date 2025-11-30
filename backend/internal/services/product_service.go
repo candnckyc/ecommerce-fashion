@@ -70,3 +70,11 @@ func (s *ProductService) GetCategories() ([]models.Category, error) {
 func (s *ProductService) ToggleActive(productID int) error {
 	return s.productRepo.ToggleActive(productID)
 }
+
+// SearchSuggestions returns search suggestions for autocomplete
+func (s *ProductService) SearchSuggestions(searchTerm string) ([]string, error) {
+	if len(searchTerm) < 2 {
+		return []string{}, nil // Too short to search
+	}
+	return s.productRepo.SearchSuggestions(searchTerm, 5) // Max 5 suggestions
+}

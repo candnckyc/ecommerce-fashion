@@ -31,7 +31,8 @@ func (r *ProductRepository) GetAll(query *models.ProductListQuery) ([]models.Pro
 
 	// Apply filters
 	if query.CategoryID != nil {
-		sql += fmt.Sprintf(" AND p.category_id = $%d", argCount)
+		// Filter by category OR its children (hierarchical)
+		sql += fmt.Sprintf(" AND (p.category_id = $%d OR p.category_id IN (SELECT id FROM categories WHERE parent_id = $%d))", argCount, argCount)
 		args = append(args, *query.CategoryID)
 		argCount++
 	}
@@ -67,9 +68,9 @@ func (r *ProductRepository) GetAll(query *models.ProductListQuery) ([]models.Pro
 	}
 	
 	if query.Search != "" {
-		sql += fmt.Sprintf(" AND (p.name ILIKE $%d OR p.description ILIKE $%d)", argCount, argCount)
-		searchTerm := "%" + query.Search + "%"
-		args = append(args, searchTerm)
+		// Temporarily using ILIKE only for debugging
+		sql += fmt.Sprintf(" AND p.name ILIKE $%d", argCount)
+		args = append(args, "%"+query.Search+"%")
 		argCount++
 	}
 
@@ -310,4 +311,33 @@ func (r *ProductRepository) ToggleActive(productID int) error {
 	query := `UPDATE products SET is_active = NOT is_active WHERE id = $1`
 	_, err := r.db.Exec(query, productID)
 	return err
+}
+
+// SearchSuggestions returns product name suggestions for autocomplete
+func (r *ProductRepository) SearchSuggestions(searchTerm string, limit int) ([]string, error) {
+	query := `
+		SELECT DISTINCT name 
+		FROM products 
+		WHERE is_active = true 
+		  AND search_vector @@ plainto_tsquery('english', $1)
+		ORDER BY name
+		LIMIT $2
+	`
+	
+	rows, err := r.db.Query(query, searchTerm, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	
+	suggestions := []string{}
+	for rows.Next() {
+		var name string
+		if err := rows.Scan(&name); err != nil {
+			return nil, err
+		}
+		suggestions = append(suggestions, name)
+	}
+	
+	return suggestions, nil
 }

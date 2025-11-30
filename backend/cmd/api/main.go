@@ -77,6 +77,7 @@ func setupRoutes(router *mux.Router, db *sql.DB, cfg *config.Config) {
 	api.HandleFunc("/products/{id}", productHandler.GetProduct).Methods("GET", "OPTIONS")
 	api.HandleFunc("/brands", productHandler.GetBrands).Methods("GET", "OPTIONS")
 	api.HandleFunc("/categories", productHandler.GetCategories).Methods("GET", "OPTIONS")
+	api.HandleFunc("/search/suggestions", productHandler.SearchSuggestions).Methods("GET", "OPTIONS")
 
 	// Protected routes (auth required)
 	protected := api.PathPrefix("").Subrouter()

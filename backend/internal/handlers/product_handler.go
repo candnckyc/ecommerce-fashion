@@ -119,3 +119,21 @@ func (h *ProductHandler) GetCategories(w http.ResponseWriter, r *http.Request) {
 
 	utils.Success(w, categories)
 }
+
+// SearchSuggestions returns autocomplete suggestions
+func (h *ProductHandler) SearchSuggestions(w http.ResponseWriter, r *http.Request) {
+	searchTerm := r.URL.Query().Get("q")
+	
+	if searchTerm == "" {
+		utils.Success(w, []string{})
+		return
+	}
+	
+	suggestions, err := h.productService.SearchSuggestions(searchTerm)
+	if err != nil {
+		utils.Error(w, http.StatusInternalServerError, "Failed to fetch suggestions")
+		return
+	}
+	
+	utils.Success(w, suggestions)
+}
