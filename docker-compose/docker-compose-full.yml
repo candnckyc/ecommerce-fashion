@@ -36,7 +36,7 @@ services:
     build: ./frontend
     container_name: ecommerce-frontend
     environment:
-      REACT_APP_API_URL: http://localhost:8080/api
+      REACT_APP_API_URL: 185.26.144.214:4501
     ports:
       - "3000:3000"
     volumes:
@@ -49,7 +49,7 @@ services:
     build: ./admin
     container_name: ecommerce-admin
     environment:
-      REACT_APP_API_URL: http://localhost:8080/api
+      REACT_APP_API_URL: 185.26.144.214:4501
     ports:
       - "3001:3000"
     volumes:

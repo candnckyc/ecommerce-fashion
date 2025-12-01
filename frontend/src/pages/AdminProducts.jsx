@@ -30,7 +30,7 @@ const AdminProducts = () => {
 
   const handleToggleActive = (productId) => {
     const token = localStorage.getItem('token');
-    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
+    const API_URL = process.env.REACT_APP_API_URL || '185.26.144.214:4501';
     
     fetch(`${API_URL}/admin/products/${productId}/toggle`, {
       method: 'PUT',

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
+const API_URL = process.env.REACT_APP_API_URL || '185.26.144.214:4501';
 
 const PaymentForm = ({ amount = 0, orderId, onSuccess, onError }) => {
   const stripe = useStripe();
